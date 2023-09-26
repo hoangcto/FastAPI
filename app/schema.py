@@ -35,7 +35,10 @@ class UserLogin(BaseModel):
 
 class Token(BaseModel):
     access_token: str
-    token_type:str
+    token_type: str
+
+    class Config:
+        orm_mode = True
 
 class TokenData(BaseModel):
-    id: Optional[str] = None
+    token_id: Optional[str] = None
