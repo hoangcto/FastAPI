@@ -43,7 +43,8 @@ def update_post(id: int, post: schema.PostCreate, db: Session = Depends(get_db),
     post_to_update = post_query.first()
     if post_to_update == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = f'post with id:{id} does not exist')
-    
+    if post_to_update.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail = f'Not authorized to perform request action')
     post_query.update( post.model_dump(), synchronize_session=False)
     db.commit()
 
@@ -53,9 +54,12 @@ def update_post(id: int, post: schema.PostCreate, db: Session = Depends(get_db),
 def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     print(current_user)
     post_query = db.query(models.Post).filter(models.Post.id == id)
-    if post_query.first() == None:
+    post = post_query.first()
+    if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = f'post with id:{id} does not exist')
     
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail = f'Not authorized to perform request action')
     post_query.delete(synchronize_session= False)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
