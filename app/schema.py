@@ -37,8 +37,5 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-    class Config:
-        orm_mode = True
-
 class TokenData(BaseModel):
     token_id: Optional[str] = None
